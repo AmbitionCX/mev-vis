@@ -1,7 +1,9 @@
+const fs = require('fs');
+const path = require('path');
 const ethers = require("ethers");
 require('dotenv').config()
 
-let provider = new ethers.JsonRpcProvider(process.env.GETH_API)
+const provider = new ethers.JsonRpcProvider(process.env.GETH_API)
 
 // Define the tracer function
 const tracer = {
@@ -10,23 +12,24 @@ const tracer = {
     fault: function (log, db) { this.retVal.push('FAULT:' + JSON.stringify(log)) },
     result: function (ctx, db) { return this.retVal }
 }
-const tracerOptions = {
-    reexec: 11565610,
-    timeout: '6000s',
-    tracer: String(tracer)
-}
 
-const call_racer = async (txHash) => {
+const call_tracer = async (txHash) => {
     try {
-        const result = await provider.send('debug_traceTransaction', [txHash, tracerOptions]);
-        console.log('Trace Result:', result);
+        const result = await provider.send('debug_traceTransaction', [txHash, tracer]);
+        
+        const destination = './Results';
+        if (!fs.existsSync(destination)){ fs.mkdirSync(destination);} // make dir when not exist
+        const filePath = path.join(destination, `Trace_${txHash}.txt`);
+        fs.writeFileSync(filePath, JSON.stringify(result, null, 2));
+
+        console.log(`Trace saved to ${filePath}`);    
     } catch (error) {
         console.error('Error tracing transaction:', error);
     }
 };
 
 // Execute the tracer function
-call_racer("0x543b0689e2c1b587d7dd8c09bb2e71f46eb9693ce37c8ca263b494acd182c02d")
+call_tracer("0x1746c86dfab0dbb1e3cf60b37b96391fcaad0b7879f3c63bfd650f2eecffb87c")
 
 
 
