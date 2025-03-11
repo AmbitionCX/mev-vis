@@ -16,11 +16,12 @@ const tracer = {
 const call_tracer = async (txHash) => {
     try {
         const result = await provider.send('debug_traceTransaction', [txHash, tracer]);
-        
+        const filtered = result.structLogs.map(({ op, stack }) => ({ op, stack }));
+
         const destination = './Results';
         if (!fs.existsSync(destination)){ fs.mkdirSync(destination);} // make dir when not exist
         const filePath = path.join(destination, `Trace_${txHash}.txt`);
-        fs.writeFileSync(filePath, JSON.stringify(result, null, 2));
+        fs.writeFileSync(filePath, JSON.stringify(filtered, null, 2));
 
         console.log(`Trace saved to ${filePath}`);    
     } catch (error) {
