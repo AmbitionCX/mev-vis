@@ -20,4 +20,4 @@ const call_receipt = async (txHash) => {
     }
 };
 
-call_receipt("0x1746c86dfab0dbb1e3cf60b37b96391fcaad0b7879f3c63bfd650f2eecffb87c")
+call_receipt("0x3579c9c56dbee98afe0fb0d4408ae45447d4a2f6cde98520f8c9c4f7e3861166")
